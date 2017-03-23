@@ -1,0 +1,21 @@
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
+
+<!--  根据latest_question_list呈现不同年级的问题 -->
+{% if latest_question_list %}
+    <ul>
+        <form action="{% url 'polls:vote' %}" method="post">  <!-- 在这里这个url是将接下来这个行为传递给vote -->
+            {% for question in latest_question_list %}
+                <li>{{ question.question_text1 }}</li>
+                {% csrf_token %}
+                {% for choice in question.gradeonechoice_set.all %}
+                    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+                    <label for="choice{{ forloop.counter }}">{{ choice.choice_text1 }}</label><br />
+                {% endfor %}
+                <input type="submit" value="Voteceshi" />
+                </form>
+            {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}

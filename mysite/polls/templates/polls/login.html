@@ -1,0 +1,117 @@
+<!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>登录</title>
+</head>
+ <style type="text/css">
+    body{color:#efd;background:#453;padding:0 5em;margin:0}
+    h1{padding:2em 1em;background:#675}
+    h2{color:#bf8;border-top:1px dotted #fff;margin-top:2em}
+    p{margin:1em 0}
+  </style>
+<body>
+<h1>登录页面：</h1>
+<form method = 'post' enctype="multipart/form-data">
+    {% csrf_token %}
+    {{uf.as_p}}
+    <input type="submit" value = "ok" />
+</form>
+</body>
+</html>
+-->
+
+
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'polls/loginstyle.css' %}" />
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>the 3rd Korla School Survey</title>
+    <!--<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>-->
+    <script src="static/polls/jquery-1.8.0.js"></script>
+    <script type="text/javascript">
+        function Get_Selected_Id(place){
+            var pro = document.getElementById(place);
+            var Selected_Id = pro.options[pro.selectedIndex].id;
+            return Selected_Id;        //返回selected属性为true的元素的id
+        }
+        function Get_Next_Place(This_Place_ID,Action){
+            var Selected_Id = Get_Selected_Id(This_Place_ID);  ///Selected_Id用来记录当前被选中的省或市的ID
+            if(Action=='Get_class')                            //从而可以在下一个级联中加载相应的市或县
+                Get_City_Data(Selected_Id);
+        }
+        function Get_City_Data(Province_Selected_Id){    //这里的Selected_Id应该是被选中的省份的ID
+            if(Province_Selected_Id == 'Not_data1'){    //如果选择了"Province"选项，则表示重置当前City和Country的选项内容，不会向服务器请求数据
+                $("#classnum").empty();
+                $("#classnum").append("<option id='Not_data2'>Your Class</option>");
+            }else{      //否则就会向服务器请求数据
+                $.getJSON('/GetClassData/',{'Gradenum':Province_Selected_Id},function(City_list){
+                    Add_city(City_list);    //调用添加城市选项函数
+                });
+            }
+        }
+        function Add_city(City_list){
+            $("#classnum").empty();
+            $("#classnum").append("<option id='Not_data2'>Your Class</option>");
+            //上面的两次清空与两次添加是为了保持级联的一致性
+            for(var index in City_list){    //获得城市列表中的城市索引
+                //添加内容的同时在option标签中添加对应的城市ID
+                var text = "<option"+" id='"+City_list[index]+"'"+" value='"+City_list[index]+"'>"+City_list[index]+"</option>";
+                $("#classnum").append(text);
+                console.log(text);  //用来观察生成的text数据
+            }
+        }
+        /* 警告函数
+         function alertValue()
+         {
+         var x=document.getElementById("grade").selectedIndex;
+         alert(document.getElementsByTagName("option")[x].value);
+         }*/
+    </script>
+</head>
+<body>
+<div id="container_demo" >
+    <!-- hidden anchor to stop jump http://www.css3create.com/Astuce-Empecher-le-scroll-avec-l-utilisation-de-target#wrap4  -->
+    <a class="hiddenanchor" id="toregister"></a>
+    <a class="hiddenanchor" id="tologin"></a>
+    <div id="wrapper">
+        <div id="login" class="animate form">
+            <form method = 'post' enctype="multipart/form-data" >
+                <h1>Log in</h1>
+                {% csrf_token %}
+                <p1>
+                    <label for="username" class="diy" data-icon="u" >账  号</label><input id="username" type="text" name="username" placeholder="身份证号"/>
+                </p1>
+                <p><label for="password" class="diy" data-icon="p">密  码</label><input id="password" type="password" name="password" placeholder="身份证号后四位"/></p>
+                <div class="diy3">
+                    <select class="diy2" id="grade" name="grade" onchange="Get_Next_Place('grade','Get_class')">
+                        <option id="Not_data1">Your Grade</option>
+                        <option id="Grade1" value="Grade1">Grade1</option>
+                        <option id="Grade2" value="Grade2">Grade2</option>
+                        <option id="Grade3" value="Grade3">Grade3</option>
+                    </select>
+                    <select class="diy2" id="classnum" name="classnum">
+                        <option id="Not_data2">Your Class</option>
+                    </select>
+                </div>
+                <p class="login button">
+                    <input type="submit" value = "Submin" />
+                </p>
+            </form>
+            <br/>
+        </div>
+    </div>
+</div>
+</body>
+<div class="diy4">
+    JLU made in 2016.06
+</div>
+</html>
+
+

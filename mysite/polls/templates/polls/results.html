@@ -1,0 +1,9 @@
+<h1>{{ question.question_text1 }}</h1>
+
+<ul>
+    {% for choice in question.gradeonechoice_set.all %}
+    <li>{{ choice.choice_text1 }} -- {{ choice.sum1 }} Sum1:{{ choice.sum1|pluralize }}</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'polls:detail' question.id %}">Vote again?</a>
